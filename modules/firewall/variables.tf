@@ -1,17 +1,48 @@
-# Copyright 2019 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+variable "project" {
+  type    = string
+  default = "default"
+}
+
+variable "vpc_name" {
+  type    = string
+  default = "default"
+}
+variable "enterprise_rule" {
+  type    = bool
+  default = false
+}
 
 
-variable "project" {}
-variable "subnet" {}
+variable "firewall_rules" {
+  description = "a firewall rule"
+  type = list(object({
+    description         = string
+    purpose             = string
+    ingress             = bool
+    priority            = number
+    enable_logging      = bool
+    enable_log_metadata = bool
+
+    target_tags            = list(string)
+    target_service_account = string
+
+    ingress_rules = object({
+      source_ranges           = list(string)
+      source_tags             = list(string)
+      source_service_accounts = list(string)
+    })
+
+    egress_rules = object({
+      dest_ranges = list(string)
+    })
+
+    allow = list(object({
+      protocol = string
+      ports    = list(string)
+    }))
+    deny = list(object({
+      protocol = string
+      ports    = list(string)
+    }))
+  }))
+}
